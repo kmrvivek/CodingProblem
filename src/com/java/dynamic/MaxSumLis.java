@@ -1,7 +1,5 @@
 package com.java.dynamic;
 
-import java.util.Arrays;
-
 public class MaxSumLis {
 
     public static void main(String[] args) {

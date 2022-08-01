@@ -2,7 +2,8 @@ package com.java.dynamic;
 
 import javafx.util.Pair;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class BuildingBridges {
     // Select max bridges without crossOver

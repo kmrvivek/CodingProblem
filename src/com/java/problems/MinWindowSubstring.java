@@ -9,6 +9,7 @@ public class MinWindowSubstring {
         MinWindowSubstring minWindowSubstring = new MinWindowSubstring();
         System.out.println(minWindowSubstring.minWindow(s, t));
         System.out.println(minWindowSubstring.minWindowRas(s, t));
+        System.out.println(minWindowSubString(s, t));
     }
     public String minWindow(String s, String t) {
 
@@ -104,6 +105,53 @@ public class MinWindowSubstring {
             return "";
         else
             return s.substring(start, start+len);
+    }
+
+    public static String minWindowSubString(String s, String t) {
+
+        int[] target = new int[256];
+        int count = 0;
+        for(Character c: t.toCharArray()){
+            if(target[c] == 0){
+                count++;
+            }
+            target[c]++;
+        }
+
+        int i=0, begin = 0, start = 0;
+        int minLength = Integer.MAX_VALUE;
+        while(i<s.length()){
+            char c = s.charAt(i);
+            target[c]--;
+            if(target[c] == 0){
+                count--;
+            }
+            if(count == 0){
+                while(count == 0){
+                    int len = i-start+1;
+                    if(len < minLength){
+                        minLength = len;
+                        begin = start;
+                    }
+                    char out = s.charAt(start);
+                    target[out]++;
+                    if(target[out] > 0){
+                        count++;
+                    }
+                    start++;
+                }
+
+            }
+
+            i++;
+        }
+        if(minLength != Integer.MAX_VALUE){
+            return s.substring(begin, begin+minLength);
+        } else {
+            return "";
+        }
+
+
     }
 }
 
