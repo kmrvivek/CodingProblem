@@ -1,0 +1,25 @@
+plugins {
+    id 'java'
+}
+
+group = 'com.java'
+version = '1.0'
+
+repositories {
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs = ['src']
+        }
+    }
+}
+
+dependencies {
+    implementation 'org.json:json:20231013'
+    implementation 'com.fasterxml.jackson.core:jackson-databind:2.17.0'
+    compileOnly 'org.projectlombok:lombok:1.18.38'
+    annotationProcessor 'org.projectlombok:lombok:1.18.38'
+}
