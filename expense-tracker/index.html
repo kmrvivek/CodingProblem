@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Spendly — Expense Tracker</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <!-- Chart.js CDN (MIT License) -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
+  </head>
+  <body>
+    <!-- ────────────────────────────────────────────
+         HEADER
+    ──────────────────────────────────────────── -->
+    <header class="app-header">
+      <div class="header-inner">
+        <div class="header-brand">
+          <span class="brand-icon">💸</span>
+          <span class="brand-name">Spendly</span>
+        </div>
+        <div class="header-month-picker" id="headerMonthPicker">
+          <button class="month-nav" id="prevMonth">&#8249;</button>
+          <span class="month-label" id="monthLabel">Loading…</span>
+          <button class="month-nav" id="nextMonth">&#8250;</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- ────────────────────────────────────────────
+         MAIN PAGES
+    ──────────────────────────────────────────── -->
+    <main class="app-main">
+
+      <!-- ── PAGE: EXPENSES ── -->
+      <section class="page active" id="page-expenses">
+        <!-- Summary Card -->
+        <div class="summary-card">
+          <div class="summary-top">
+            <div class="summary-item">
+              <span class="summary-label">Total Spent</span>
+              <span class="summary-value" id="totalSpent">₹0.00</span>
+            </div>
+            <div class="summary-divider"></div>
+            <div class="summary-item">
+              <span class="summary-label">Transactions</span>
+              <span class="summary-value" id="totalTxn">0</span>
+            </div>
+          </div>
+          <!-- Category filter chips -->
+          <div class="chip-scroll" id="categoryChips">
+            <!-- populated by JS -->
+          </div>
+        </div>
+
+        <!-- Expense List -->
+        <div class="section-title-row">
+          <h2 class="section-title">Transactions</h2>
+          <span class="section-sub" id="activeFilterLabel">All Categories</span>
+        </div>
+        <div class="expense-list" id="expenseList">
+          <!-- populated by JS -->
+        </div>
+        <div class="empty-state hidden" id="emptyExpenses">
+          <span class="empty-icon">🧾</span>
+          <p>No expenses yet.<br/>Tap <strong>+</strong> to add one!</p>
+        </div>
+      </section>
+
+      <!-- ── PAGE: ADD EXPENSE ── -->
+      <section class="page" id="page-add">
+        <div class="form-card">
+          <h2 class="form-title">New Expense</h2>
+
+          <div class="form-group">
+            <label class="form-label" for="expAmount">Amount</label>
+            <div class="amount-input-wrap">
+              <span class="currency-symbol">₹</span>
+              <input
+                type="number"
+                id="expAmount"
+                class="form-input amount-input"
+                placeholder="0.00"
+                min="0"
+                step="0.01"
+                inputmode="decimal"
+              />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="expNote">Note</label>
+            <input
+              type="text"
+              id="expNote"
+              class="form-input"
+              placeholder="What did you spend on?"
+              maxlength="80"
+            />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="expDate">Date</label>
+            <input type="date" id="expDate" class="form-input" />
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Category</label>
+            <div class="category-grid" id="categoryGrid">
+              <!-- populated by JS -->
+            </div>
+          </div>
+
+          <button class="btn-primary btn-full" id="saveExpenseBtn">
+            Save Expense
+          </button>
+        </div>
+      </section>
+
+      <!-- ── PAGE: CATEGORIES ── -->
+      <section class="page" id="page-categories">
+        <div class="section-title-row" style="margin-top:0">
+          <h2 class="section-title">Categories</h2>
+        </div>
+
+        <!-- Add category form -->
+        <div class="form-card">
+          <h3 class="form-title" style="font-size:1rem">Add New Category</h3>
+          <div class="form-group">
+            <label class="form-label" for="catName">Name</label>
+            <input
+              type="text"
+              id="catName"
+              class="form-input"
+              placeholder="e.g. Gym, Coffee…"
+              maxlength="20"
+            />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Pick an Icon</label>
+            <div class="icon-picker" id="iconPicker">
+              <!-- populated by JS -->
+            </div>
+            <span class="icon-selection-label">Selected: <span id="selectedIconPreview">—</span></span>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Colour</label>
+            <div class="color-picker" id="colorPicker">
+              <!-- populated by JS -->
+            </div>
+          </div>
+          <button class="btn-primary btn-full" id="saveCategoryBtn">
+            Add Category
+          </button>
+        </div>
+
+        <!-- Existing categories -->
+        <div class="section-title-row">
+          <h2 class="section-title">All Categories</h2>
+        </div>
+        <div class="cat-manage-list" id="catManageList">
+          <!-- populated by JS -->
+        </div>
+      </section>
+
+      <!-- ── PAGE: STATISTICS ── -->
+      <section class="page" id="page-stats">
+        <div class="stats-toggle">
+          <button class="stats-tab active" data-period="monthly" id="tabMonthly">Monthly</button>
+          <button class="stats-tab" data-period="yearly" id="tabYearly">Yearly</button>
+        </div>
+
+        <!-- Monthly stats -->
+        <div id="statsMonthly">
+          <div class="chart-card">
+            <h3 class="chart-title">Spending by Category</h3>
+            <div class="chart-container">
+              <canvas id="donutChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">Daily Spending</h3>
+            <div class="chart-container chart-container--bar">
+              <canvas id="barChart"></canvas>
+            </div>
+          </div>
+          <!-- Category breakdown list -->
+          <div class="chart-card">
+            <h3 class="chart-title">Category Breakdown</h3>
+            <div id="categoryBreakdown" class="breakdown-list"></div>
+          </div>
+        </div>
+
+        <!-- Yearly stats -->
+        <div id="statsYearly" class="hidden">
+          <div class="chart-card">
+            <h3 class="chart-title">Monthly Spending (<span id="yearLabel"></span>)</h3>
+            <div class="chart-container chart-container--bar">
+              <canvas id="yearBarChart"></canvas>
+            </div>
+          </div>
+          <div class="chart-card">
+            <h3 class="chart-title">Yearly Category Split</h3>
+            <div class="chart-container">
+              <canvas id="yearDonutChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ────────────────────────────────────────────
+         FAB (Add Button) — only on expenses page
+    ──────────────────────────────────────────── -->
+    <button class="fab" id="fabBtn" title="Add Expense">＋</button>
+
+    <!-- ────────────────────────────────────────────
+         BOTTOM NAV
+    ──────────────────────────────────────────── -->
+    <nav class="bottom-nav">
+      <button class="nav-item active" data-page="expenses">
+        <span class="nav-icon">🏠</span>
+        <span class="nav-label">Home</span>
+      </button>
+      <button class="nav-item" data-page="add">
+        <span class="nav-icon">➕</span>
+        <span class="nav-label">Add</span>
+      </button>
+      <button class="nav-item" data-page="stats">
+        <span class="nav-icon">📊</span>
+        <span class="nav-label">Stats</span>
+      </button>
+      <button class="nav-item" data-page="categories">
+        <span class="nav-icon">🏷️</span>
+        <span class="nav-label">Categories</span>
+      </button>
+    </nav>
+
+    <!-- ────────────────────────────────────────────
+         MODAL: Confirm Delete
+    ──────────────────────────────────────────── -->
+    <div class="modal-overlay hidden" id="deleteModal">
+      <div class="modal-box">
+        <div class="modal-icon">🗑️</div>
+        <h3 class="modal-title">Delete Expense?</h3>
+        <p class="modal-body">This action cannot be undone.</p>
+        <div class="modal-actions">
+          <button class="btn-secondary" id="cancelDeleteBtn">Cancel</button>
+          <button class="btn-danger" id="confirmDeleteBtn">Delete</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ────────────────────────────────────────────
+         TOAST
+    ──────────────────────────────────────────── -->
+    <div class="toast hidden" id="toast"></div>
+
+    <!-- JS (order matters) -->
+    <script src="js/data.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/charts.js"></script>
+    <script src="js/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,1652 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Coding Pattern Tracker</title>
+  <style>
+    :root {
+        --bg-color: #0d0d0f;
+        --surface-color: #161618;
+        --surface-hover: #1e1e22;
+        --surface-elevated: #1a1a1e;
+        --primary-color: #a78bfa;
+        --primary-glow: rgba(167, 139, 250, 0.15);
+        --secondary-color: #34d399;
+        --secondary-glow: rgba(52, 211, 153, 0.15);
+        --accent-color: #f472b6;
+        --text-primary: #f1f0f5;
+        --text-secondary: #8b8a99;
+        --text-muted: #555466;
+        --border-color: #252530;
+        --border-subtle: #1e1e28;
+        --success-color: #34d399;
+        --card-radius: 12px;
+        --transition: all 0.25s ease;
+        --easy-color: #34d399;
+        --easy-bg: rgba(52, 211, 153, 0.1);
+        --medium-color: #fbbf24;
+        --medium-bg: rgba(251, 191, 36, 0.1);
+        --hard-color: #f87171;
+        --hard-bg: rgba(248, 113, 113, 0.1);
+    }
+
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+
+    body {
+        font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        line-height: 1.6;
+        min-height: 100vh;
+        padding-bottom: 80px;
+    }
+
+    /* ===== HEADER ===== */
+    header {
+        background: linear-gradient(135deg, #111115 0%, #161620 100%);
+        padding: 22px 5%;
+        border-bottom: 1px solid var(--border-color);
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+        backdrop-filter: blur(10px);
+    }
+
+    .header-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        margin-bottom: 18px;
+        gap: 15px;
+    }
+
+    h1 {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: var(--text-primary);
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        letter-spacing: -0.3px;
+    }
+
+    h1 .logo-icon {
+        width: 36px;
+        height: 36px;
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 4px 15px rgba(167,139,250,0.3);
+    }
+
+    .header-stats {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .stat-pill {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-color);
+        border-radius: 20px;
+        padding: 6px 14px;
+        font-size: 0.85rem;
+    }
+
+    .stat-pill .stat-value {
+        font-weight: 700;
+        color: var(--primary-color);
+    }
+
+    .stat-pill .stat-label {
+        color: var(--text-secondary);
+    }
+
+    .progress-wrap {
+        width: 100%;
+    }
+
+    .progress-info {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 8px;
+        font-size: 0.82rem;
+        color: var(--text-secondary);
+    }
+
+    .progress-info strong {
+        color: var(--primary-color);
+        font-size: 0.95rem;
+    }
+
+    .progress-container {
+        width: 100%;
+        background-color: rgba(255,255,255,0.05);
+        border-radius: 10px;
+        height: 8px;
+        overflow: hidden;
+    }
+
+    .progress-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color), var(--secondary-color));
+        background-size: 200% 100%;
+        width: 0%;
+        transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: shimmer 3s linear infinite;
+        border-radius: 10px;
+    }
+
+    @keyframes shimmer {
+        0% { background-position: 200% 0; }
+        100% { background-position: -200% 0; }
+    }
+
+    /* ===== CONTROLS ===== */
+    .controls {
+        padding: 18px 5%;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+        background-color: var(--bg-color);
+        border-bottom: 1px solid var(--border-subtle);
+        max-width: 100%;
+    }
+
+    .search-box {
+        flex: 1;
+        min-width: 220px;
+        position: relative;
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--text-muted);
+        pointer-events: none;
+    }
+
+    .search-box input {
+        width: 100%;
+        padding: 11px 15px 11px 42px;
+        border-radius: var(--card-radius);
+        border: 1px solid var(--border-color);
+        background-color: var(--surface-color);
+        color: var(--text-primary);
+        font-size: 0.95rem;
+        outline: none;
+        transition: var(--transition);
+    }
+
+    .search-box input::placeholder { color: var(--text-muted); }
+
+    .search-box input:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px var(--primary-glow);
+        background-color: var(--surface-elevated);
+    }
+
+    .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: var(--card-radius);
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        font-size: 0.875rem;
+        white-space: nowrap;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
+        color: #fff;
+        box-shadow: 0 4px 15px rgba(167,139,250,0.25);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(167,139,250,0.4);
+    }
+
+    .btn-outline {
+        background-color: transparent;
+        border: 1px solid var(--border-color);
+        color: var(--text-secondary);
+    }
+
+    .btn-outline:hover {
+        border-color: var(--hard-color);
+        color: var(--hard-color);
+        background: var(--hard-bg);
+    }
+
+    /* ===== ACHIEVEMENTS ===== */
+    .achievements-strip {
+        padding: 18px 5% 8px;
+        max-width: 1100px;
+        margin: 0 auto;
+    }
+
+    .achievements-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 14px;
+    }
+
+    .achievement-card {
+        position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle at top right, rgba(167, 139, 250, 0.18), transparent 38%),
+            linear-gradient(145deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+        border: 1px solid var(--border-color);
+        border-radius: 18px;
+        padding: 16px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+        transition: transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease;
+        animation: floatCard 5s ease-in-out infinite;
+    }
+
+    .achievement-card:nth-child(2) { animation-delay: 0.4s; }
+    .achievement-card:nth-child(3) { animation-delay: 0.8s; }
+    .achievement-card:nth-child(4) { animation-delay: 1.2s; }
+
+    .achievement-card:hover {
+        transform: translateY(-4px);
+        border-color: rgba(167, 139, 250, 0.35);
+        box-shadow: 0 18px 34px rgba(0,0,0,0.28);
+    }
+
+    .achievement-card.unlocked {
+        border-color: rgba(251, 191, 36, 0.35);
+        box-shadow: 0 16px 36px rgba(251, 191, 36, 0.12);
+    }
+
+    .achievement-card::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(120deg, transparent, rgba(255,255,255,0.06), transparent);
+        transform: translateX(-120%);
+        animation: cardShine 6s linear infinite;
+        pointer-events: none;
+    }
+
+    .achievement-top {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        gap: 12px;
+        margin-bottom: 12px;
+    }
+
+    .achievement-icon {
+        width: 42px;
+        height: 42px;
+        border-radius: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.25rem;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(255,255,255,0.06);
+        box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .achievement-card.unlocked .achievement-icon {
+        background: linear-gradient(135deg, rgba(251,191,36,0.18), rgba(244,114,182,0.15));
+        border-color: rgba(251,191,36,0.2);
+        animation: pulseGlow 2.2s ease-in-out infinite;
+    }
+
+    .achievement-status {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--text-muted);
+        padding: 5px 9px;
+        border-radius: 999px;
+        border: 1px solid var(--border-color);
+        background: rgba(255,255,255,0.03);
+    }
+
+    .achievement-card.unlocked .achievement-status {
+        color: #fcd34d;
+        border-color: rgba(251,191,36,0.24);
+        background: rgba(251,191,36,0.12);
+    }
+
+    .achievement-title {
+        font-size: 0.95rem;
+        font-weight: 700;
+        margin-bottom: 2px;
+    }
+
+    .achievement-subtitle {
+        color: var(--text-secondary);
+        font-size: 0.8rem;
+        margin-bottom: 12px;
+    }
+
+    .achievement-progress {
+        height: 7px;
+        background: rgba(255,255,255,0.05);
+        border-radius: 999px;
+        overflow: hidden;
+        margin-bottom: 10px;
+    }
+
+    .achievement-progress-bar {
+        height: 100%;
+        width: 0;
+        border-radius: inherit;
+        background: linear-gradient(90deg, var(--primary-color), var(--accent-color), #fcd34d);
+        transition: width 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+        box-shadow: 0 0 16px rgba(167, 139, 250, 0.25);
+    }
+
+    .achievement-footer {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.78rem;
+        color: var(--text-secondary);
+    }
+
+    .achievement-value {
+        font-weight: 700;
+        color: var(--text-primary);
+    }
+
+    /* ===== MAIN CONTENT ===== */
+    main {
+        padding: 24px 5%;
+        max-width: 1000px;
+        margin: 0 auto;
+    }
+
+    .section-intro {
+        margin-bottom: 20px;
+        font-size: 0.85rem;
+        color: var(--text-muted);
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    /* ===== PATTERN CARD ===== */
+    .pattern-section {
+        margin-bottom: 12px;
+        background-color: var(--surface-color);
+        border-radius: var(--card-radius);
+        border: 1px solid var(--border-color);
+        overflow: hidden;
+        transition: box-shadow 0.25s ease, border-color 0.25s ease;
+    }
+
+    .pattern-section:hover {
+        border-color: #2e2e3a;
+        box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    .pattern-section.all-done {
+        border-color: rgba(52, 211, 153, 0.25);
+    }
+
+    .pattern-header {
+        padding: 16px 20px;
+        cursor: pointer;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        user-select: none;
+        gap: 12px;
+        transition: background 0.2s;
+    }
+
+    .pattern-header:hover {
+        background-color: var(--surface-hover);
+    }
+
+    .pattern-header-left {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        flex: 1;
+        min-width: 0;
+    }
+
+    .pattern-icon {
+        width: 32px;
+        height: 32px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1rem;
+        flex-shrink: 0;
+        background: var(--primary-glow);
+        color: var(--primary-color);
+    }
+
+    .pattern-title {
+        font-size: 1rem;
+        font-weight: 600;
+        color: var(--text-primary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .pattern-header-right {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        flex-shrink: 0;
+    }
+
+    .pattern-status {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--text-secondary);
+        background: rgba(255,255,255,0.04);
+        border: 1px solid var(--border-color);
+        padding: 3px 10px;
+        border-radius: 20px;
+        white-space: nowrap;
+    }
+
+    .pattern-status.completed-badge {
+        color: var(--success-color);
+        background: var(--secondary-glow);
+        border-color: rgba(52, 211, 153, 0.2);
+    }
+
+    .chevron {
+        color: var(--text-muted);
+        transition: transform 0.3s ease;
+        flex-shrink: 0;
+    }
+
+    .pattern-header.active .chevron {
+        transform: rotate(180deg);
+    }
+
+    /* Mini progress bar inside pattern */
+    .pattern-mini-progress {
+        height: 3px;
+        background: rgba(255,255,255,0.04);
+        width: 100%;
+    }
+
+    .pattern-mini-bar {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+        transition: width 0.5s ease;
+    }
+
+    /* ===== QUESTION LIST ===== */
+    .question-list {
+        display: none;
+        padding: 6px 0;
+    }
+
+    .question-list.open {
+        display: block;
+        animation: slideDown 0.25s ease-out;
+    }
+
+    .question-item {
+        display: flex;
+        align-items: center;
+        padding: 11px 20px;
+        border-bottom: 1px solid var(--border-subtle);
+        transition: background 0.15s, transform 0.2s ease, border-color 0.2s ease;
+        gap: 12px;
+        position: relative;
+    }
+
+    .question-item:last-child {
+        border-bottom: none;
+    }
+
+    .question-item:hover {
+        background-color: var(--surface-hover);
+        transform: translateX(2px);
+    }
+
+    .question-item.highlight {
+        background: linear-gradient(90deg, rgba(167,139,250,0.08), transparent);
+        border-left: 3px solid var(--primary-color);
+        animation: selectedPulse 1.6s ease-in-out infinite;
+    }
+
+    .question-item.completed {
+        opacity: 0.65;
+    }
+
+    .question-item.just-completed {
+        animation: completePop 0.45s ease;
+    }
+
+    /* ===== CHECKBOX — Fixed with <label> wrapping ===== */
+    .checkbox-label {
+        position: relative;
+        width: 22px;
+        height: 22px;
+        flex-shrink: 0;
+        cursor: pointer;
+        display: block;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+        position: absolute;
+        opacity: 0;
+        width: 0;
+        height: 0;
+        pointer-events: none;
+    }
+
+    .checkmark {
+        position: absolute;
+        inset: 0;
+        background-color: transparent;
+        border: 2px solid var(--text-muted);
+        border-radius: 6px;
+        transition: var(--transition);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .checkmark svg {
+        opacity: 0;
+        transform: scale(0.5);
+        transition: all 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+        stroke: #fff;
+    }
+
+    .checkbox-label:hover .checkmark {
+        border-color: var(--primary-color);
+        background: var(--primary-glow);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked ~ .checkmark {
+        background-color: var(--success-color);
+        border-color: var(--success-color);
+        box-shadow: 0 0 10px rgba(52, 211, 153, 0.3);
+    }
+
+    .checkbox-label input[type="checkbox"]:checked ~ .checkmark svg {
+        opacity: 1;
+        transform: scale(1);
+    }
+
+    /* ===== QUESTION ROW CONTENT ===== */
+    .question-content {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        min-width: 0;
+    }
+
+    .question-link {
+        color: var(--text-primary);
+        text-decoration: none;
+        font-size: 0.9rem;
+        flex: 1;
+        min-width: 0;
+        transition: color 0.15s;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    .question-link:hover {
+        color: var(--primary-color);
+    }
+
+    .question-item.completed .question-link {
+        text-decoration: line-through;
+        color: var(--text-muted);
+    }
+
+    .question-meta {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-shrink: 0;
+    }
+
+    .difficulty-badge {
+        font-size: 0.7rem;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 20px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .badge-easy   { color: var(--easy-color);   background: var(--easy-bg); }
+    .badge-medium { color: var(--medium-color); background: var(--medium-bg); }
+    .badge-hard   { color: var(--hard-color);   background: var(--hard-bg); }
+
+    .external-link-icon {
+        color: var(--text-muted);
+        opacity: 0;
+        transition: opacity 0.2s;
+        flex-shrink: 0;
+    }
+
+    .question-item:hover .external-link-icon {
+        opacity: 1;
+    }
+
+    /* ===== TOAST ===== */
+    .toast {
+        position: fixed;
+        bottom: 28px;
+        left: 50%;
+        transform: translateX(-50%) translateY(10px);
+        background: var(--surface-elevated);
+        color: var(--text-primary);
+        padding: 12px 22px;
+        border-radius: 50px;
+        box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+        border: 1px solid var(--border-color);
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        white-space: nowrap;
+    }
+
+    .toast.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateX(-50%) translateY(0);
+    }
+
+    /* ===== EMPTY STATE ===== */
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: var(--text-muted);
+    }
+
+    .empty-state svg { margin-bottom: 16px; opacity: 0.4; }
+    .empty-state p { font-size: 1rem; }
+
+    /* ===== ANIMATIONS ===== */
+    @keyframes slideDown {
+        from { opacity: 0; transform: translateY(-8px); }
+        to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes floatCard {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+
+    @keyframes cardShine {
+        0% { transform: translateX(-120%); }
+        100% { transform: translateX(120%); }
+    }
+
+    @keyframes pulseGlow {
+        0%, 100% { box-shadow: 0 0 0 rgba(251,191,36,0.15); }
+        50% { box-shadow: 0 0 18px rgba(251,191,36,0.28); }
+    }
+
+    @keyframes completePop {
+        0% { transform: scale(0.98); }
+        60% { transform: scale(1.015); }
+        100% { transform: scale(1); }
+    }
+
+    @keyframes selectedPulse {
+        0%, 100% { box-shadow: inset 0 0 0 rgba(167,139,250,0); }
+        50% { box-shadow: inset 0 0 0 999px rgba(167,139,250,0.03); }
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 900px) {
+        .achievements-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 640px) {
+        header { padding: 16px 4%; }
+        .controls { padding: 14px 4%; }
+        .achievements-strip { padding: 14px 4% 4px; }
+        main { padding: 16px 4%; }
+        .header-stats { display: none; }
+        .pattern-header { padding: 14px 16px; }
+        .question-item { padding: 10px 14px; }
+        .pattern-title { font-size: 0.9rem; }
+        .achievements-grid { grid-template-columns: 1fr; }
+        .achievement-card { padding: 14px; }
+        .achievement-footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <h1>
+      <span class="logo-icon">
+        <svg fill="none" height="18" stroke="white" stroke-linecap="round" stroke-linejoin="round"
+             stroke-width="2.5" viewBox="0 0 24 24" width="18">
+          <polyline points="16 18 22 12 16 6"></polyline>
+          <polyline points="8 6 2 12 8 18"></polyline>
+        </svg>
+      </span>
+      Code Pattern Tracker
+    </h1>
+    <div class="header-stats">
+      <div class="stat-pill">
+        <span class="stat-value" id="solved-count">0</span>
+        <span class="stat-label">/ <span id="total-count">0</span> Solved</span>
+      </div>
+      <div class="stat-pill">
+        <span class="stat-value" id="progress-text">0%</span>
+        <span class="stat-label">Done</span>
+      </div>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-info">
+      <span>Overall Progress</span>
+      <span><strong id="progress-percent">0%</strong> complete</span>
+    </div>
+    <div class="progress-container">
+      <div class="progress-bar" id="main-progress-bar"></div>
+    </div>
+  </div>
+</header>
+
+<div class="controls">
+  <div class="search-box">
+    <svg class="search-icon" fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+         stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="16">
+      <circle cx="11" cy="11" r="8"></circle>
+      <path d="m21 21-4.35-4.35"></path>
+    </svg>
+    <label for="search-input"></label><input id="search-input"
+                                             placeholder="Search patterns or questions..."
+                                             type="text">
+  </div>
+  <button class="btn btn-primary" onclick="pickDailyChallenge()">
+    <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+         stroke-linejoin="round"
+         stroke-width="2.5" viewBox="0 0 24 24" width="16">
+      <polygon points="5 3 19 12 5 21 5 3"></polygon>
+    </svg>
+    Pick Daily Question
+  </button>
+  <button class="btn btn-outline" onclick="resetData()">
+    <svg fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+         stroke-linejoin="round"
+         stroke-width="2" viewBox="0 0 24 24" width="16">
+      <path d="M3 6h18"></path>
+      <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+      <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+    </svg>
+    Reset
+  </button>
+</div>
+
+<section class="achievements-strip">
+  <div class="achievements-grid" id="achievements-grid">
+    <!-- Achievement cards will be injected here via JavaScript -->
+  </div>
+</section>
+
+<main id="tracker-container">
+  <!-- Content will be injected here via JavaScript -->
+</main>
+
+<div class="toast" id="toast">
+  <span id="toast-icon">✓</span>
+  <span id="toast-message">Notification</span>
+</div>
+
+<script>
+  // =====================================================================
+  // DATA
+  // =====================================================================
+  const rawData = [
+      {
+          pattern: "Pattern: Two Pointers",
+          questions: [
+              { title: "Pair with Target Sum (easy)", link: "https://leetcode.com/problems/two-sum-ii-input-array-is-sorted/description/" },
+              { title: "Rearrange 0 and 1 (easy)", link: "https://www.geeksforgeeks.org/problems/segregate-0s-and-1s5106/1" },
+              { title: "Remove Duplicates (easy)", link: "https://leetcode.com/problems/remove-duplicates-from-sorted-list/" },
+              { title: "Squaring a Sorted Array (easy)", link: "https://leetcode.com/problems/squares-of-a-sorted-array/" },
+              { title: "Triplet Sum to Zero (medium)", link: "https://leetcode.com/problems/3sum/" },
+              { title: "Triplet Sum Close to Target (medium)", link: "https://leetcode.com/problems/3sum-closest/" },
+              { title: "Triplets with Smaller Sum (medium)", link: "https://www.geeksforgeeks.org/problems/count-triplets-with-sum-smaller-than-x5549/1" },
+              { title: "Subarrays with Product Less than a Target (medium)", link: "https://leetcode.com/problems/subarray-product-less-than-k/" },
+              { title: "Dutch National Flag Problem (medium)", link: "https://leetcode.com/problems/sort-colors/description/" },
+              { title: "Problem Challenge 1: Quadruple Sum to Target (medium)", link: "https://leetcode.com/problems/4sum/" },
+              { title: "Problem Challenge 2: Comparing Strings containing Backspaces (medium)", link: "https://leetcode.com/problems/backspace-string-compare/" },
+              { title: "Problem Challenge 3: Minimum Window Sort (medium)", link: "https://leetcode.com/problems/shortest-unsorted-continuous-subarray/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Fast & Slow pointers",
+          questions: [
+              { title: "LinkedList Cycle (easy)", link: "https://leetcode.com/problems/linked-list-cycle/" },
+              { title: "Start of LinkedList Cycle (medium)", link: "https://leetcode.com/problems/linked-list-cycle-ii/" },
+              { title: "Happy Number (medium)", link: "https://leetcode.com/problems/happy-number/" },
+              { title: "Find the Duplicate Number (medium)", link: "https://leetcode.com/problems/find-the-duplicate-number/description/" },
+              { title: "Middle of the LinkedList (easy)", link: "https://leetcode.com/problems/middle-of-the-linked-list/" },
+              { title: "Problem Challenge 1: Palindrome LinkedList (medium)", link: "https://leetcode.com/problems/palindrome-linked-list/" },
+              { title: "Problem Challenge 2: Rearrange a LinkedList (medium)", link: "https://leetcode.com/problems/reorder-list/" },
+              { title: "Problem Challenge 3: Cycle in a Circular Array (hard)", link: "https://leetcode.com/problems/circular-array-loop/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Sliding Window",
+          questions: [
+              { title: "Maximum Sum Subarray of Size K (easy)", link: "https://www.geeksforgeeks.org/problems/max-sum-subarray-of-size-k5313/1" },
+              { title: "Smallest Subarray with a given sum (easy)", link: "https://leetcode.com/problems/minimum-size-subarray-sum/" },
+              { title: "Longest Substring with K Distinct Characters (medium)", link: "https://www.geeksforgeeks.org/problems/longest-k-unique-characters-substring0853/1" },
+              { title: "Fruits into Baskets (medium)", link: "https://leetcode.com/problems/fruit-into-baskets/" },
+              { title: "No-repeat Substring (hard)", link: "https://leetcode.com/problems/longest-substring-without-repeating-characters/" },
+              { title: "Longest Substring with Same Letters after Replacement (hard)", link: "https://leetcode.com/problems/longest-repeating-character-replacement/" },
+              { title: "Longest Subarray with Ones after Replacement (hard)", link: "https://leetcode.com/problems/max-consecutive-ones-iii/" },
+              { title: "Minimum size subarray SUM (medium)", link: "https://leetcode.com/problems/minimum-size-subarray-sum/" },
+              { title: "Minimum Size Substring (HARD)", link: "https://leetcode.com/problems/minimum-window-substring/" },
+              { title: "Problem Challenge 1: Permutation in a String (hard)", link: "https://leetcode.com/problems/permutation-in-string/" },
+              { title: "Problem Challenge 2: String Anagrams (hard)", link: "https://leetcode.com/problems/find-all-anagrams-in-a-string/" },
+              { title: "Problem Challenge 3: Smallest Window containing Substring (hard)", link: "https://leetcode.com/problems/minimum-window-substring/" },
+              { title: "Problem Challenge 4: Words Concatenation (hard)", link: "https://leetcode.com/problems/substring-with-concatenation-of-all-words/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Kadane pattern",
+          questions: [
+              { title: "Maximum subarray sum (medium)", link: "https://leetcode.com/problems/maximum-subarray/" },
+              { title: "Minimum Subarray Sum (medium)", link: "https://www.geeksforgeeks.org/problems/smallest-sum-contiguous-subarray/1" },
+              { title: "Maximum product subarray (medium)", link: "https://leetcode.com/problems/maximum-product-subarray/" },
+              { title: "Maximum subarray sum with one deletion (medium)", link: "https://leetcode.com/problems/maximum-subarray-sum-with-one-deletion/" },
+              { title: "Maximum absolute sum of any subarray (medium)", link: "https://leetcode.com/problems/maximum-absolute-sum-of-any-subarray/" },
+              { title: "Maximum sum in circular array variant (medium)", link: "https://leetcode.com/problems/maximum-sum-circular-subarray/" }
+          ]
+      },
+      {
+          pattern: "PATTERN: PREFIX SUM",
+          questions: [
+              { title: "Subarray Sum Equals K (EASY)", link: "https://leetcode.com/problems/subarray-sum-equals-k/" },
+              { title: "Find Pivot Index (EASY)", link: "https://leetcode.com/problems/find-pivot-index/" },
+              { title: "Subarray Sums Divisible By K (Med)", link: "https://leetcode.com/problems/subarray-sums-divisible-by-k/" },
+              { title: "Contiguous array (MED)", link: "https://leetcode.com/problems/contiguous-array/" },
+              { title: "Problem challenge: Shortest Subarray With Sum at Least K (HARD)", link: "https://leetcode.com/problems/shortest-subarray-with-sum-at-least-k/" },
+              { title: "Problem challenge: Count Range Sum (hard)", link: "https://leetcode.com/problems/count-of-range-sum/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Merge Intervals",
+          questions: [
+              { title: "Merge Intervals (medium)", link: "https://leetcode.com/problems/merge-intervals/" },
+              { title: "Insert Interval (medium)", link: "https://leetcode.com/problems/insert-interval/" },
+              { title: "Intervals Intersection (medium)", link: "https://leetcode.com/problems/interval-list-intersections/" },
+              { title: "Overlapping Intervals (medium)", link: "https://www.geeksforgeeks.org/check-if-any-two-intervals-overlap-among-a-given-set-of-intervals/" },
+              { title: "Problem Challenge 1: Minimum Meeting Rooms (hard)", link: "https://www.lintcode.com/problem/meeting-rooms-ii/" },
+              { title: "Problem Challenge 2: Maximum CPU Load (hard)", link: "https://www.geeksforgeeks.org/maximum-cpu-load-from-the-given-list-of-jobs/" },
+              { title: "Problem Challenge 3: Employee Free Time (hard)", link: "https://www.codertrain.co/employee-free-time" }
+          ]
+      },
+      {
+          pattern: "Pattern: Cyclic Sort",
+          questions: [
+              { title: "Cyclic Sort (easy)", link: "https://www.geeksforgeeks.org/sort-an-array-which-contain-1-to-n-values-in-on-using-cycle-sort/" },
+              { title: "Find the Missing Number (easy)", link: "https://leetcode.com/problems/missing-number/" },
+              { title: "Find all Missing Numbers (easy)", link: "https://leetcode.com/problems/find-all-numbers-disappeared-in-an-array/" },
+              { title: "Find the Duplicate Number (easy)", link: "https://leetcode.com/problems/find-the-duplicate-number/" },
+              { title: "Find all Duplicate Numbers (easy)", link: "https://leetcode.com/problems/find-all-duplicates-in-an-array/" },
+              { title: "Problem Challenge 1: Find the Corrupt Pair (easy)", link: "https://www.geeksforgeeks.org/dsa/find-a-repeating-and-a-missing-number/" },
+              { title: "Problem Challenge 2: Find the Smallest Missing Positive Number (medium)", link: "https://leetcode.com/problems/first-missing-positive/" },
+              { title: "Problem Challenge 3: Find the First K Missing Positive Numbers (hard)", link: "https://www.geeksforgeeks.org/dsa/k-th-missing-element-in-sorted-array/" }
+          ]
+      },
+      {
+          pattern: "Pattern: In-place Reversal of a LinkedList",
+          questions: [
+              { title: "Reverse a LinkedList (easy)", link: "https://leetcode.com/problems/reverse-linked-list/" },
+              { title: "Reverse a Sub-list (medium)", link: "https://leetcode.com/problems/reverse-linked-list-ii/" },
+              { title: "Reverse every K-element Sub-list (medium)", link: "https://leetcode.com/problems/reverse-nodes-in-k-group/" },
+              { title: "Problem Challenge 1: Reverse alternating K-element Sub-list (medium)", link: "https://www.geeksforgeeks.org/reverse-alternate-k-nodes-in-a-singly-linked-list/" },
+              { title: "Problem Challenge 2: Rotate a LinkedList (medium)", link: "https://leetcode.com/problems/rotate-list/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Stack",
+          questions: [
+              { title: "Balanced Parentheses (easy)", link: "https://leetcode.com/problems/valid-parentheses/" },
+              { title: "Reverse a String (easy)", link: "https://leetcode.com/problems/reverse-string/" },
+              { title: "Decimal to Binary Conversion (easy)", link: "https://www.geeksforgeeks.org/dsa/program-to-convert-decimal-to-binary-number/" },
+              { title: "Next Greater Element (easy)", link: "https://leetcode.com/problems/next-greater-element-i/" },
+              { title: "Sorting a Stack (medium)", link: "https://www.geeksforgeeks.org/sort-a-stack-using-recursion/" },
+              { title: "Simplify Path (medium)", link: "https://leetcode.com/problems/simplify-path/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Monotonic Stack",
+          questions: [
+              { title: "Next Greater Element (easy)", link: "https://leetcode.com/problems/next-greater-element-i/" },
+              { title: "Daily Temperatures (easy)", link: "https://leetcode.com/problems/daily-temperatures/" },
+              { title: "Remove Nodes From Linked List (easy)", link: "https://leetcode.com/problems/remove-nodes-from-linked-list/" },
+              { title: "Remove All Adjacent Duplicates In String (easy)", link: "https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string/" },
+              { title: "Remove All Adjacent Duplicates in String II (medium)", link: "https://leetcode.com/problems/remove-all-adjacent-duplicates-in-string-ii/" },
+              { title: "Remove K Digits (hard)", link: "https://leetcode.com/problems/remove-k-digits/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Hash Maps",
+          questions: [
+              { title: "First Non-repeating Character (easy)", link: "https://leetcode.com/problems/first-unique-character-in-a-string/" },
+              { title: "Largest Unique Number (easy)", link: "https://leetcode.com/problems/largest-unique-number/" },
+              { title: "Maximum Number of Balloons (easy)", link: "https://leetcode.com/problems/maximum-number-of-balloons/" },
+              { title: "Longest Palindrome(easy)", link: "https://leetcode.com/problems/longest-palindrome/" },
+              { title: "Ransom Note (easy)", link: "https://leetcode.com/problems/ransom-note/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Tree Breadth First Search",
+          questions: [
+              { title: "Binary Tree Level Order Traversal (easy)", link: "https://leetcode.com/problems/binary-tree-level-order-traversal/" },
+              { title: "Reverse Level Order Traversal (easy)", link: "https://leetcode.com/problems/binary-tree-level-order-traversal-ii/" },
+              { title: "Zigzag Traversal (medium)", link: "https://leetcode.com/problems/binary-tree-zigzag-level-order-traversal/" },
+              { title: "Level Averages in a Binary Tree (easy)", link: "https://leetcode.com/problems/average-of-levels-in-binary-tree/" },
+              { title: "Minimum Depth of a Binary Tree (easy)", link: "https://leetcode.com/problems/minimum-depth-of-binary-tree/" },
+              { title: "Maximum Depth of a Binary Tree (easy)", link: "https://leetcode.com/problems/maximum-depth-of-binary-tree/" },
+              { title: "Level Order Successor (easy)", link: "https://www.geeksforgeeks.org/level-order-successor-of-a-node-in-binary-tree/" },
+              { title: "Connect Level Order Siblings (medium)", link: "https://leetcode.com/problems/populating-next-right-pointers-in-each-node/" },
+              { title: "Problem Challenge 1: Connect All Level Order Siblings (medium)", link: "https://www.geeksforgeeks.org/connect-nodes-at-same-level-with-o1-extra-space/" },
+              { title: "Problem Challenge 2: Right View of a Binary Tree (easy)", link: "https://leetcode.com/problems/binary-tree-right-side-view/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Tree Depth First Search",
+          questions: [
+              { title: "Binary Tree Path Sum (easy)", link: "https://leetcode.com/problems/path-sum/" },
+              { title: "All Paths for a Sum (medium)", link: "https://leetcode.com/problems/path-sum-iii/" },
+              { title: "Sum of Path Numbers (medium)", link: "https://leetcode.com/problems/sum-root-to-leaf-numbers/" },
+              { title: "Path With Given Sequence (medium)", link: "https://www.geeksforgeeks.org/check-root-leaf-path-given-sequence/" },
+              { title: "Count Paths for a Sum (medium)", link: "https://leetcode.com/problems/path-sum-iii/" },
+              { title: "Problem Challenge 1: Tree Diameter (medium)", link: "https://leetcode.com/problems/diameter-of-binary-tree/" },
+              { title: "Problem Challenge 2: Path with Maximum Sum (hard)", link: "https://leetcode.com/problems/binary-tree-maximum-path-sum/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Graphs",
+          questions: [
+              { title: "Graph Traversal: Depth First Search(DFS) (easy)", link: "https://www.geeksforgeeks.org/depth-first-search-or-dfs-for-a-graph/" },
+              { title: "Graph Traversal: Breadth First Search (BFS) (easy)", link: "https://www.geeksforgeeks.org/breadth-first-search-or-bfs-for-a-graph/" },
+              { title: "Find if Path Exists in Graph(easy)", link: "https://leetcode.com/problems/find-if-path-exists-in-graph/" },
+              { title: "Number of Provinces (medium)", link: "https://leetcode.com/problems/number-of-provinces/" },
+              { title: "Minimum Number of Vertices to Reach All Nodes(medium)", link: "https://leetcode.com/problems/minimum-number-of-vertices-to-reach-all-nodes/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Island (Matrix traversal)",
+          questions: [
+              { title: "Number of Islands (easy)", link: "https://leetcode.com/problems/number-of-islands/" },
+              { title: "Biggest Island (easy)", link: "https://leetcode.com/problems/max-area-of-island/" },
+              { title: "Flood Fill (easy)", link: "https://leetcode.com/problems/flood-fill/" },
+              { title: "Number of Closed Islands (easy)", link: "https://leetcode.com/problems/number-of-closed-islands/" },
+              { title: "Problem Challenge 1 (easy)", link: "#" },
+              { title: "Problem Challenge 2 (medium)", link: "#" },
+              { title: "Problem Challenge 3 (medium)", link: "#" }
+          ]
+      },
+      {
+          pattern: "Pattern: Two Heaps",
+          questions: [
+              { title: "Find the Median of a Number Stream (medium)", link: "https://leetcode.com/problems/find-median-from-data-stream/" },
+              { title: "Sliding Window Median (hard)", link: "https://leetcode.com/problems/sliding-window-median/" },
+              { title: "Maximize Capital (hard)", link: "https://leetcode.com/problems/ipo/" },
+              { title: "Maximum Sum Combinations (medium)", link: "https://www.geeksforgeeks.org/k-maximum-sum-combinations-two-arrays/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Subsets",
+          questions: [
+              { title: "Subsets (easy)", link: "https://leetcode.com/problems/subsets/" },
+              { title: "Subsets With Duplicates (easy)", link: "https://leetcode.com/problems/subsets-ii/" },
+              { title: "Permutations (medium)", link: "https://leetcode.com/problems/permutations/" },
+              { title: "String Permutations by changing case (medium)", link: "https://leetcode.com/problems/letter-case-permutation/" },
+              { title: "Balanced Parentheses (hard)", link: "https://leetcode.com/problems/generate-parentheses/" },
+              { title: "Unique Generalized Abbreviations (hard)", link: "https://leetcode.com/problems/generalized-abbreviation/" }
+          ]
+      },
+      {
+          pattern: "Pattern : Modified Binary Search",
+          questions: [
+              { title: "Order-agnostic Binary Search (easy)", link: "https://www.geeksforgeeks.org/order-agnostic-binary-search/" },
+              { title: "Ceiling of a Number (medium)", link: "https://www.geeksforgeeks.org/ceiling-in-a-sorted-array/" },
+              { title: "Next Letter (medium)", link: "https://leetcode.com/problems/find-smallest-letter-greater-than-target/" },
+              { title: "Number Range (medium)", link: "https://leetcode.com/problems/find-first-and-last-position-of-element-in-sorted-array/" },
+              { title: "Search in a Sorted Infinite Array (medium)", link: "https://www.geeksforgeeks.org/find-position-element-sorted-array-infinite-numbers/" },
+              { title: "Minimum Difference Element (medium)", link: "https://www.geeksforgeeks.org/dsa/find-closest-number-array/" },
+              { title: "Bitonic Array Maximum (easy)", link: "https://www.geeksforgeeks.org/find-the-maximum-element-in-an-array-which-is-first-increasing-and-then-decreasing/" },
+              { title: "Problem Challenge 1: Search Bitonic Array (medium)", link: "https://leetcode.com/problems/find-in-mountain-array/" },
+              { title: "Problem Challenge 2: Search in Rotated Array (medium)", link: "https://leetcode.com/problems/search-in-rotated-sorted-array/" },
+              { title: "Problem Challenge 3: Rotation Count (medium)", link: "https://www.geeksforgeeks.org/find-rotation-count-rotated-sorted-array/" },
+              { title: "Search a 2D Matrix (medium)", link: "https://leetcode.com/problems/search-a-2d-matrix/" },
+              { title: "Minimum Number of Days to Make m Bouquets (medium)", link: "https://leetcode.com/problems/minimum-number-of-days-to-make-m-bouquets/" },
+              { title: "Koko Eating Bananas (medium)", link: "https://leetcode.com/problems/koko-eating-bananas/" },
+              { title: "Capacity To Ship Packages Within D Days (medium)", link: "https://leetcode.com/problems/capacity-to-ship-packages-within-d-days/" },
+              { title: "Median of Two Sorted Arrays (hard)", link: "https://leetcode.com/problems/median-of-two-sorted-arrays/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Bitwise XOR",
+          questions: [
+              { title: "Single Number (easy)", link: "https://leetcode.com/problems/single-number/" },
+              { title: "Two Single Numbers (medium)", link: "https://leetcode.com/problems/single-number-iii/" },
+              { title: "Complement of Base 10 Number (medium)", link: "https://leetcode.com/problems/number-complement/" },
+              { title: "Problem Challenge 1: Flip and Invert an Image (hard)", link: "https://leetcode.com/problems/flipping-an-image/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Top 'K' Elements",
+          questions: [
+              { title: "Top 'K' Numbers (easy)", link: "https://www.geeksforgeeks.org/k-largestor-smallest-elements-in-an-array/" },
+              { title: "Kth Smallest Number (easy)", link: "https://www.geeksforgeeks.org/kth-smallestlargest-element-unsorted-array/" },
+              { title: "K' Closest Points to the Origin (easy)", link: "https://leetcode.com/problems/k-closest-points-to-origin/" },
+              { title: "Connect Ropes (easy)", link: "https://www.geeksforgeeks.org/connect-n-ropes-minimum-cost/" },
+              { title: "Top 'K' Frequent Numbers (medium)", link: "https://leetcode.com/problems/top-k-frequent-elements/" },
+              { title: "Frequency Sort (medium)", link: "https://leetcode.com/problems/sort-array-by-increasing-frequency/" },
+              { title: "Kth Largest Number in a Stream (medium)", link: "https://leetcode.com/problems/kth-largest-element-in-a-stream/" },
+              { title: "K' Closest Numbers (medium)", link: "https://www.geeksforgeeks.org/find-k-closest-elements-given-value/" },
+              { title: "Maximum Distinct Elements (medium)", link: "https://www.geeksforgeeks.org/maximum-distinct-elements-removing-k-elements/" },
+              { title: "Sum of Elements (medium)", link: "https://www.geeksforgeeks.org/kth-largest-sum-contiguous-subarray/" },
+              { title: "Rearrange String (hard)", link: "https://leetcode.com/problems/reorganize-string/" },
+              { title: "Problem Challenge 1: Rearrange String K Distance Apart (hard)", link: "https://leetcode.com/problems/rearrange-string-k-distance-apart/" },
+              { title: "Problem Challenge 2: Scheduling Tasks (hard)", link: "https://leetcode.com/problems/task-scheduler/" },
+              { title: "Problem Challenge 3: Frequency Stack (hard)", link: "https://leetcode.com/problems/frequency-stack/" }
+          ]
+      },
+      {
+          pattern: "Pattern: K-way merge",
+          questions: [
+              { title: "Merge K Sorted Lists (medium)", link: "https://leetcode.com/problems/merge-k-sorted-lists/" },
+              { title: "Kth Smallest Number in M Sorted Lists (Medium)", link: "https://www.geeksforgeeks.org/find-m-th-smallest-value-in-k-sorted-arrays/" },
+              { title: "Kth Smallest Number in a Sorted Matrix (Hard)", link: "https://leetcode.com/problems/kth-smallest-element-in-a-sorted-matrix/" },
+              { title: "Smallest Number Range (Hard)", link: "https://leetcode.com/problems/smallest-range-covering-elements-from-k-lists/" },
+              { title: "Problem Challenge 1: K Pairs with Largest Sums (hard)", link: "https://leetcode.com/problems/find-k-pairs-with-smallest-sums/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Greedy Algorithms",
+          questions: [
+              { title: "Valid Palindrome II (easy)", link: "https://leetcode.com/problems/valid-palindrome-ii/" },
+              { title: "Maximum Length of Pair Chain (medium)", link: "https://leetcode.com/problems/maximum-length-of-pair-chain/" },
+              { title: "Minimum Add to Make Parentheses Valid (medium)", link: "https://leetcode.com/problems/minimum-add-to-make-parentheses-valid/" },
+              { title: "Remove Duplicate Letters (medium)", link: "https://leetcode.com/problems/remove-duplicate-letters/" },
+              { title: "Largest Palindromic Number (Medium)", link: "https://leetcode.com/problems/largest-palindromic-number/" },
+              { title: "Removing Minimum and Maximum From Array (medium)", link: "https://leetcode.com/problems/removing-minimum-and-maximum-from-array/" }
+          ]
+      },
+      {
+          pattern: "Pattern : 0/1 Knapsack (Dynamic Programming)",
+          questions: [
+              { title: "0/1 Knapsack (medium)", link: "https://www.geeksforgeeks.org/0-1-knapsack-problem-dp-10/" },
+              { title: "Equal Subset Sum Partition (medium)", link: "https://leetcode.com/problems/partition-equal-subset-sum/" },
+              { title: "Subset Sum (medium)", link: "https://www.geeksforgeeks.org/subset-sum-problem-dp-25/" },
+              { title: "Minimum Subset Sum Difference (hard)", link: "https://www.geeksforgeeks.org/partition-a-set-into-two-subsets-such-that-the-difference-of-subset-sums-is-minimum/" },
+              { title: "Problem Challenge 1: Count of Subset Sum (hard)", link: "https://www.geeksforgeeks.org/count-of-subsets-with-sum-equal-to-x/" },
+              { title: "Problem Challenge 2: Target Sum (hard)", link: "https://leetcode.com/problems/target-sum/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Backtracking",
+          questions: [
+              { title: "Combination Sum (medium)", link: "https://leetcode.com/problems/combination-sum/" },
+              { title: "Word Search (medium)", link: "https://leetcode.com/problems/word-search/" },
+              { title: "Sudoku Solver (hard)", link: "https://leetcode.com/problems/sudoku-solver/" },
+              { title: "Factor Combinations (medium)", link: "https://leetcode.com/problems/factor-combinations/" },
+              { title: "Split a String Into the Max Number of Unique Substrings (medium)", link: "https://leetcode.com/problems/split-a-string-into-the-max-number-of-unique-substrings/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Trie",
+          questions: [
+              { title: "Implement Trie (Prefix Tree) (medium)", link: "https://leetcode.com/problems/implement-trie-prefix-tree/" },
+              { title: "Index Pairs of a String (easy)", link: "https://leetcode.com/problems/index-pairs-of-a-string/" },
+              { title: "Design Add and Search Words Data Structure (medium)", link: "https://leetcode.com/problems/design-add-and-search-words-data-structure/" },
+              { title: "Extra Characters in a String (medium)", link: "https://leetcode.com/problems/extra-characters-in-a-string/" },
+              { title: "Search Suggestions System (medium)", link: "https://leetcode.com/problems/search-suggestions-system/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Topological Sort (Graph)",
+          questions: [
+              { title: "Topological Sort (medium)", link: "https://www.geeksforgeeks.org/topological-sorting/" },
+              { title: "Tasks Scheduling (medium)", link: "https://leetcode.com/problems/course-schedule/" },
+              { title: "Tasks Scheduling Order (medium)", link: "https://leetcode.com/problems/course-schedule-ii/" },
+              { title: "All Tasks Scheduling Orders (hard)", link: "https://leetcode.com/problems/course-schedule-ii/" },
+              { title: "Alien Dictionary (hard)", link: "https://leetcode.com/problems/alien-dictionary/" },
+              { title: "Problem Challenge 1: Reconstructing a Sequence (hard)", link: "https://leetcode.com/problems/sequence-reconstruction/" },
+              { title: "Problem Challenge 2: Minimum Height Trees (hard)", link: "https://leetcode.com/problems/minimum-height-trees/" }
+          ]
+      },
+      {
+          pattern: "Pattern: Union Find",
+          questions: [
+              { title: "Redundant Connection (medium)", link: "https://leetcode.com/problems/redundant-connection/" },
+              { title: "Number of Provinces (medium)", link: "https://leetcode.com/problems/number-of-provinces/" },
+              { title: "Is Graph Bipartite? (medium)", link: "https://leetcode.com/problems/is-graph-bipartite/" },
+              { title: "Path With Minimum Effort (medium)", link: "https://leetcode.com/problems/path-with-minimum-effort/" }
+          ]
+      },
+      {
+          pattern: "Ordered Set",
+          questions: [
+              { title: "Merge Similar Items (easy)", link: "https://leetcode.com/problems/merge-similar-items/" },
+              { title: "132 Pattern (medium)", link: "https://leetcode.com/problems/132-pattern/" },
+              { title: "My Calendar I (medium)", link: "https://leetcode.com/problems/my-calendar-i/" }
+          ]
+      }
+  ];
+
+  // =====================================================================
+  // APP LOGIC
+  // =====================================================================
+
+  const STORAGE_KEY = 'codeTrackerData_v2';
+  let appData = [];
+  let unlockedAchievements = new Set();
+
+  // Pattern emoji icons
+  const PATTERN_ICONS = [
+    '👆','⚡','🪟','📈','➕','🔀','🔄','🔗','📚','📉',
+    '#️⃣','🌳','🌲','🕸️','🏝️','⚖️','🧩','🔍','⊕','🏆',
+    '🌊','💡','🎒','🔙','🌐','🗂️','🔗','📦'
+  ];
+
+  const ACHIEVEMENTS = [
+      {
+          id: 'first-steps',
+          icon: '🥉',
+          title: 'First Steps',
+          subtitle: 'Complete your first 5 questions.',
+          goal: stats => stats.solved,
+          target: 5,
+          valueLabel: stats => `${stats.solved}/5 solved`
+      },
+      {
+          id: 'pattern-master',
+          icon: '🏆',
+          title: 'Pattern Master',
+          subtitle: 'Fully finish 3 pattern sections.',
+          goal: stats => stats.completedPatterns,
+          target: 3,
+          valueLabel: stats => `${stats.completedPatterns}/3 sections`
+      },
+      {
+          id: 'consistency-king',
+          icon: '🔥',
+          title: 'Consistency',
+          subtitle: 'Reach a 7-question streak toward your next push.',
+          goal: stats => stats.nextStreak,
+          target: 7,
+          valueLabel: stats => `${stats.nextStreak}/7 recent wins`
+      },
+      {
+          id: 'legend-mode',
+          icon: '👑',
+          title: 'Legend Mode',
+          subtitle: 'Hit 50% overall tracker completion.',
+          goal: stats => stats.percent,
+          target: 50,
+          valueLabel: stats => `${stats.percent}% complete`
+      }
+  ];
+
+  /**
+   * Detect difficulty from question title string.
+   * Returns 'easy' | 'medium' | 'hard' | null
+   */
+  function getDifficulty(title) {
+      const t = title.toLowerCase();
+      if (t.includes('(hard)') || t.includes(' hard)') || t.includes('(hard'))  return 'hard';
+      if (t.includes('(medium)') || t.includes(' medium)') || t.includes('(med)')) return 'medium';
+      if (t.includes('(easy)') || t.includes(' easy)')) return 'easy';
+      return null;
+  }
+
+  /** Build difficulty badge HTML */
+  function difficultyBadge(title) {
+      const d = getDifficulty(title);
+      if (!d) return '';
+      const labels = { easy: 'Easy', medium: 'Med', hard: 'Hard' };
+      return `<span class="difficulty-badge badge-${d}">${labels[d]}</span>`;
+  }
+
+  function getProgressStats() {
+      let total = 0;
+      let solved = 0;
+      let completedPatterns = 0;
+
+      appData.forEach(pattern => {
+          total += pattern.questions.length;
+          const doneCount = pattern.questions.filter(q => q.done).length;
+          solved += doneCount;
+          if (pattern.questions.length > 0 && doneCount === pattern.questions.length) {
+              completedPatterns++;
+          }
+      });
+
+      const percent = total === 0 ? 0 : Math.round((solved / total) * 100);
+      const nextStreak = solved % 7 === 0 && solved !== 0 ? 7 : solved % 7;
+      const remaining = total - solved;
+
+      return { total, solved, percent, completedPatterns, nextStreak, remaining };
+  }
+
+  function renderAchievements(stats = getProgressStats()) {
+      const grid = document.getElementById('achievements-grid');
+      if (!grid) return;
+
+      grid.innerHTML = ACHIEVEMENTS.map(item => {
+          const current = item.goal(stats);
+          const pct = Math.min(100, Math.round((current / item.target) * 100));
+          const unlocked = current >= item.target;
+
+          return `
+            <article class="achievement-card${unlocked ? ' unlocked' : ''}">
+              <div class="achievement-top">
+                <div class="achievement-icon">${item.icon}</div>
+                <span class="achievement-status">${unlocked ? 'Unlocked' : 'In Progress'}</span>
+              </div>
+              <div class="achievement-title">${item.title}</div>
+              <div class="achievement-subtitle">${item.subtitle}</div>
+              <div class="achievement-progress">
+                <div class="achievement-progress-bar" style="width:${pct}%"></div>
+              </div>
+              <div class="achievement-footer">
+                <span>${item.valueLabel(stats)}</span>
+                <span class="achievement-value">${pct}%</span>
+              </div>
+            </article>
+          `;
+      }).join('');
+  }
+
+  function checkAchievements(stats = getProgressStats()) {
+      ACHIEVEMENTS.forEach(item => {
+          const isUnlocked = item.goal(stats) >= item.target;
+          if (isUnlocked && !unlockedAchievements.has(item.id)) {
+              unlockedAchievements.add(item.id);
+              showToast(item.icon, `${item.title} unlocked!`);
+          }
+      });
+  }
+
+  // ── Init ─────────────────────────────────────────────────────────────
+  function init() {
+      loadData();
+      unlockedAchievements = new Set(
+          ACHIEVEMENTS.filter(item => item.goal(getProgressStats()) >= item.target).map(item => item.id)
+      );
+      renderAchievements();
+      renderTracker();
+      updateGlobalProgress();
+      setupSearch();
+  }
+
+  // ── Persistence ───────────────────────────────────────────────────────
+  function loadData() {
+      try {
+          const stored = localStorage.getItem(STORAGE_KEY);
+          if (stored) {
+              const parsed = JSON.parse(stored);
+              // Merge stored `done` state onto fresh rawData so new questions always appear
+              appData = JSON.parse(JSON.stringify(rawData));
+              appData.forEach(pattern => {
+                  const storedPattern = parsed.find(p => p.pattern === pattern.pattern);
+                  if (storedPattern) {
+                      pattern.questions.forEach(q => {
+                          const sq = storedPattern.questions.find(sq => sq.title === q.title);
+                          if (sq) q.done = !!sq.done;
+                      });
+                  }
+              });
+          } else {
+              appData = JSON.parse(JSON.stringify(rawData));
+          }
+      } catch (e) {
+          console.warn('Failed to load saved data, starting fresh.', e);
+          appData = JSON.parse(JSON.stringify(rawData));
+      }
+  }
+
+  function saveData() {
+      try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(appData));
+      } catch (e) {
+          console.warn('Failed to save data to localStorage.', e);
+      }
+      updateGlobalProgress();
+      const stats = getProgressStats();
+      renderAchievements(stats);
+      checkAchievements(stats);
+  }
+
+  // ── Render ────────────────────────────────────────────────────────────
+  function renderTracker(filterText = '') {
+      const container = document.getElementById('tracker-container');
+      container.innerHTML = '';
+      const lowerFilter = filterText.toLowerCase().trim();
+      let visibleCount = 0;
+
+      appData.forEach((pattern, pIndex) => {
+          const patternMatches = pattern.pattern.toLowerCase().includes(lowerFilter);
+          const filteredQuestions = pattern.questions.filter(q =>
+              q.title.toLowerCase().includes(lowerFilter)
+          );
+
+          if (lowerFilter && !patternMatches && filteredQuestions.length === 0) return;
+          visibleCount++;
+
+          const totalInPattern     = pattern.questions.length;
+          const completedInPattern = pattern.questions.filter(q => q.done).length;
+          const pctInPattern       = totalInPattern === 0 ? 0 : Math.round((completedInPattern / totalInPattern) * 100);
+          const allDone            = completedInPattern === totalInPattern;
+
+          // ── Section wrapper ──
+          const section = document.createElement('div');
+          section.className = `pattern-section${allDone ? ' all-done' : ''}`;
+          section.dataset.pIndex = pIndex;
+
+          // Open by default when searching; closed otherwise
+          const isOpen = lowerFilter.length > 0;
+
+          // ── Header ──
+          const header = document.createElement('div');
+          header.className = `pattern-header${isOpen ? ' active' : ''}`;
+
+          const icon = PATTERN_ICONS[pIndex % PATTERN_ICONS.length];
+          const statusClass = allDone ? 'pattern-status completed-badge' : 'pattern-status';
+          const statusText  = allDone ? '✓ All Done' : `${completedInPattern}/${totalInPattern}`;
+
+          header.innerHTML = `
+            <div class="pattern-header-left">
+              <span class="pattern-icon">${icon}</span>
+              <span class="pattern-title">${pattern.pattern}</span>
+            </div>
+            <div class="pattern-header-right">
+              <span class="${statusClass}">${statusText}</span>
+              <svg class="chevron" fill="none" height="16" stroke="currentColor" stroke-linecap="round"
+                   stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16">
+                <polyline points="6 9 12 15 18 9"></polyline>
+              </svg>
+            </div>
+          `;
+
+          header.addEventListener('click', () => {
+              const list = section.querySelector('.question-list');
+              const open = header.classList.toggle('active');
+              list.classList.toggle('open', open);
+          });
+
+          // ── Mini progress bar ──
+          const miniProg = document.createElement('div');
+          miniProg.className = 'pattern-mini-progress';
+          miniProg.innerHTML = `<div class="pattern-mini-bar" style="width:${pctInPattern}%"></div>`;
+
+          // ── Question list ──
+          const list = document.createElement('div');
+          list.className = `question-list${isOpen ? ' open' : ''}`;
+
+          const questionsToRender = (lowerFilter && !patternMatches) ? filteredQuestions : pattern.questions;
+
+          questionsToRender.forEach(q => {
+              const originalQIndex = pattern.questions.indexOf(q);
+              const checkId = `check-${pIndex}-${originalQIndex}`;
+
+              const item = document.createElement('div');
+              item.className = `question-item${q.done ? ' completed' : ''}`;
+              item.id = `q-${pIndex}-${originalQIndex}`;
+
+              const hasLink = q.link && q.link !== '#';
+              const badge   = difficultyBadge(q.title);
+              const externalIcon = hasLink
+                  ? `<svg class="external-link-icon" fill="none" height="13" stroke="currentColor"
+                          stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                          viewBox="0 0 24 24" width="13">
+                       <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>
+                       <polyline points="15 3 21 3 21 9"/>
+                       <line x1="10" y1="14" x2="21" y2="3"/>
+                     </svg>`
+                  : '';
+
+              item.innerHTML = `
+                <label class="checkbox-label" for="${checkId}" title="${q.done ? 'Mark incomplete' : 'Mark complete'}">
+                  <input type="checkbox" id="${checkId}" ${q.done ? 'checked' : ''}>
+                  <span class="checkmark">
+                    <svg fill="none" height="12" stroke="currentColor" stroke-linecap="round"
+                         stroke-linejoin="round" stroke-width="3" viewBox="0 0 24 24" width="12">
+                      <polyline points="20 6 9 17 4 12"></polyline>
+                    </svg>
+                  </span>
+                </label>
+                <div class="question-content">
+                  <a href="${q.link}" target="${hasLink ? '_blank' : '_self'}" rel="noopener noreferrer"
+                     class="question-link" title="${q.title}"
+                     onclick="${!hasLink ? 'return false;' : ''}">${q.title}</a>
+                  <div class="question-meta">
+                    ${badge}
+                    ${externalIcon}
+                  </div>
+                </div>
+              `;
+
+              // Attach checkbox change listener — the KEY FIX
+              const checkbox = item.querySelector(`#${checkId}`);
+              checkbox.addEventListener('change', () => toggleQuestion(pIndex, originalQIndex));
+
+              list.appendChild(item);
+          });
+
+          section.appendChild(header);
+          section.appendChild(miniProg);
+          section.appendChild(list);
+          container.appendChild(section);
+      });
+
+      if (visibleCount === 0) {
+          container.innerHTML = `
+            <div class="empty-state">
+              <svg fill="none" height="48" stroke="currentColor" stroke-linecap="round"
+                   stroke-linejoin="round" stroke-width="1.5" viewBox="0 0 24 24" width="48">
+                <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+              </svg>
+              <p>No questions found for "<strong>${filterText}</strong>"</p>
+            </div>`;
+      }
+  }
+
+  // ── Toggle ────────────────────────────────────────────────────────────
+  function toggleQuestion(pIndex, qIndex) {
+      const q = appData[pIndex].questions[qIndex];
+      q.done = !q.done;
+
+      // Update item class
+      const item = document.getElementById(`q-${pIndex}-${qIndex}`);
+      if (item) {
+          item.classList.toggle('completed', q.done);
+          item.classList.remove('just-completed');
+          if (q.done) {
+              void item.offsetWidth;
+              item.classList.add('just-completed');
+          }
+          // Sync checkbox visual state (it's already toggled by native change, but just in case)
+          const cb = item.querySelector('input[type="checkbox"]');
+          if (cb) cb.checked = q.done;
+      }
+
+      // Update pattern header badge + mini bar
+      const section = document.querySelector(`.pattern-section[data-p-index="${pIndex}"]`)
+                   || document.getElementById(`q-${pIndex}-${qIndex}`)?.closest('.pattern-section');
+      if (section) {
+          const total    = appData[pIndex].questions.length;
+          const done     = appData[pIndex].questions.filter(q => q.done).length;
+          const pct      = Math.round((done / total) * 100);
+          const allDone  = done === total;
+
+          const statusEl = section.querySelector('.pattern-status');
+          if (statusEl) {
+              statusEl.className = allDone ? 'pattern-status completed-badge' : 'pattern-status';
+              statusEl.textContent = allDone ? '🏆 Pattern Cleared' : `${done}/${total}`;
+          }
+
+          const miniBar = section.querySelector('.pattern-mini-bar');
+          if (miniBar) miniBar.style.width = `${pct}%`;
+
+          section.classList.toggle('all-done', allDone);
+      }
+
+      saveData();
+
+      const stats = getProgressStats();
+      if (q.done) {
+          const completedPattern = appData[pIndex].questions.every(question => question.done);
+          if (completedPattern) {
+              showToast('🏆', `${appData[pIndex].pattern} completed!`);
+          } else {
+              showToast('✨', `${stats.solved} solved • ${stats.remaining} to go`);
+          }
+      } else {
+          showToast('↩', 'Marked incomplete');
+      }
+  }
+
+  // ── Global Progress ───────────────────────────────────────────────────
+  function updateGlobalProgress() {
+      const stats = getProgressStats();
+
+      document.getElementById('main-progress-bar').style.width = `${stats.percent}%`;
+      document.getElementById('progress-text').textContent    = `${stats.percent}%`;
+      document.getElementById('progress-percent').textContent = `${stats.percent}%`;
+      document.getElementById('solved-count').textContent     = stats.solved;
+      document.getElementById('total-count').textContent      = stats.total;
+  }
+
+  // ── Search ────────────────────────────────────────────────────────────
+  function setupSearch() {
+      document.getElementById('search-input').addEventListener('input', e => {
+          renderTracker(e.target.value);
+      });
+  }
+
+  // ── Reset ─────────────────────────────────────────────────────────────
+  window.resetData = function () {
+      if (confirm('Reset ALL progress? This cannot be undone.')) {
+          localStorage.removeItem(STORAGE_KEY);
+          loadData();
+          renderTracker();
+          updateGlobalProgress();
+          showToast('🗑️', 'Progress has been reset');
+      }
+  };
+
+  // ── Daily Challenge ───────────────────────────────────────────────────
+  window.pickDailyChallenge = function () {
+      const incomplete = [];
+      appData.forEach((p, pIndex) => {
+          p.questions.forEach((q, qIndex) => {
+              if (!q.done) incomplete.push({ pIndex, qIndex });
+          });
+      });
+
+      if (incomplete.length === 0) {
+          showToast('🎉', 'You completed everything!');
+          return;
+      }
+
+      const pick = incomplete[Math.floor(Math.random() * incomplete.length)];
+
+      // Clear search and re-render
+      document.getElementById('search-input').value = '';
+      renderTracker();
+
+      // Find the rendered section for this pIndex
+      const allSections = document.querySelectorAll('.pattern-section');
+      let targetSection = null;
+      allSections.forEach(sec => {
+          if (parseInt(sec.dataset.pIndex) === pick.pIndex) targetSection = sec;
+      });
+
+      if (targetSection) {
+          const header = targetSection.querySelector('.pattern-header');
+          const list   = targetSection.querySelector('.question-list');
+          header.classList.add('active');
+          list.classList.add('open');
+      }
+
+      setTimeout(() => {
+          const element = document.getElementById(`q-${pick.pIndex}-${pick.qIndex}`);
+          if (element) {
+              document.querySelectorAll('.highlight').forEach(el => el.classList.remove('highlight'));
+              element.classList.add('highlight');
+              element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+              showToast('🎯', 'Today\'s challenge picked!');
+          }
+      }, 80);
+  };
+
+  // ── Toast ─────────────────────────────────────────────────────────────
+  let toastTimer = null;
+  function showToast(icon, message) {
+      const toast   = document.getElementById('toast');
+      const iconEl  = document.getElementById('toast-icon');
+      const msgEl   = document.getElementById('toast-message');
+      iconEl.textContent  = icon;
+      msgEl.textContent   = message;
+      toast.classList.add('show');
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove('show'), 3000);
+  }
+
+  // ── Boot ──────────────────────────────────────────────────────────────
+  init();
+
+</script>
+</body>
+</html>
